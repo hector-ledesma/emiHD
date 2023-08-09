@@ -1,12 +1,12 @@
 #include "Application.h"
 
 namespace emiHD {
-    Application::Application() : m_imguiController() {}
+    Application::Application() : m_imgui(), m_interface() {}
     Application::~Application() {}
 
     void Application::run() {
         // Initialize UI
-        if (!m_imguiController.init()) return;
+        if (!m_imgui.init()) return;
         // Main loop
         bool done = false;
         while (!done)
@@ -22,19 +22,22 @@ namespace emiHD {
             if (done) { break; }
 
             // Start the Dear ImGui frame
-            m_imguiController.newFrame();
+            m_imgui.newFrame();
 
             // Application UI
+            // Application layout will be placed within one full screen parent window
+            static ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDecoration;
+            m_interface.createRootLayout(root_flags);
             {
-                m_imguiController.demoWindow();
-                m_imguiController.createTestWindow();
+                m_imgui.demoWindow();
+                m_imgui.createTestWindow();
             }
 
             // Rendering
-            m_imguiController.render();
+            m_imgui.render();
             
         }
         // Cleanup UI
-        m_imguiController.cleanup();
+        m_imgui.cleanup();
     }
 }

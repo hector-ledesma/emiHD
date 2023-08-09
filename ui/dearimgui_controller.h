@@ -41,6 +41,8 @@ namespace UI {
 		void cleanup();
 		void newFrame();
 		void render();
+
+		// UI Elements
 		void createTestWindow();
 		void demoWindow();
 

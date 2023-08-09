@@ -8,16 +8,16 @@
 namespace UI {
     class Element {
     public:
-        virtual render() = 0;
+        virtual void render() = 0;
         void setFlags(int flags) { m_flags = flags; };
         void renderIn(std::string parent) {
-            if (ImGui::Begin(parent)) {
+            if (ImGui::Begin(parent.c_str())) {
                 this->render();
                 ImGui::End();
             }
         };
     protected:
-        int m_flags;
+        int m_flags = 0;
     };
 }
 #endif
