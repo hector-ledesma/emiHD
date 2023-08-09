@@ -6,13 +6,133 @@ namespace {
 }
 
 namespace UI {
+    WNDCLASSEXW ImGuiController::wc = {};
+    HWND ImGuiController::hwnd = nullptr;
+    FrameContext ImGuiController::m_frameContext[ImGuiController::NUM_FRAMES_IN_FLIGHT] = {};
+    ID3D12Resource* ImGuiController::m_mainRenderTargetResource[NUM_BACK_BUFFERS] = {};
+    D3D12_CPU_DESCRIPTOR_HANDLE ImGuiController::m_mainRenderTargetDescriptor[NUM_BACK_BUFFERS] = {};
+    UINT ImGuiController::m_frameIndex = 0;
+    ID3D12Device* ImGuiController::m_pd3dDevice = nullptr;
+    ID3D12DescriptorHeap* ImGuiController::m_pd3dRtvDescHeap = nullptr;
+    ID3D12DescriptorHeap* ImGuiController::m_pd3dSrvDescHeap = nullptr;
+    ID3D12CommandQueue* ImGuiController::m_pd3dCommandQueue = nullptr;
+    ID3D12GraphicsCommandList* ImGuiController::m_pd3dCommandList = nullptr;
+    ID3D12Fence* ImGuiController::m_fence = nullptr;
+    HANDLE						ImGuiController::m_fenceEvent = nullptr;
+    UINT64						ImGuiController::m_fenceLastSignaledValue = 0;
+    IDXGISwapChain3* ImGuiController::m_pSwapChain = nullptr;
+    HANDLE                      ImGuiController::m_hSwapChainWaitableObject = nullptr;
     // public methods
-    ImGuiController::ImGuiController() {}
+    ImGuiController::ImGuiController(){}
     ImGuiController::~ImGuiController(){}
 
-    void ImGuiController::init() {
+    bool ImGuiController::init() {
+        // Create application window
+        wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"emiHD WNDCLASS", nullptr };
+        ::RegisterClassExW(&wc);
 
+        hwnd = ::CreateWindowW(wc.lpszClassName, L"emiHD HWND", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+
+        // Initialize Direct3D
+        if (!CreateDeviceD3D(hwnd))
+        {
+            CleanupDeviceD3D();
+            ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+            return false;
+        }
+
+        // Show the window
+        ::ShowWindow(hwnd, SW_SHOWDEFAULT);
+        ::UpdateWindow(hwnd);
+
+        // Setup Dear ImGui context
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
+
+        // Setup Dear ImGui style
+        ImGui::StyleColorsLight();
+
+        // Setup Platform/Renderer backends
+        ImGui_ImplWin32_Init(hwnd);
+        ImGui_ImplDX12_Init(m_pd3dDevice, NUM_FRAMES_IN_FLIGHT,
+            DXGI_FORMAT_R8G8B8A8_UNORM, m_pd3dSrvDescHeap,
+            m_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(),
+            m_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
+        return true;
     }
+    
+    void ImGuiController::cleanup() {
+        WaitForLastSubmittedFrame();
+
+        // Cleanup
+        ImGui_ImplDX12_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+
+        CleanupDeviceD3D();
+        ::DestroyWindow(hwnd);
+        ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+    }
+
+    void ImGuiController::newFrame() {
+        ImGui_ImplDX12_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    void ImGuiController::render() {
+        ImGui::Render();
+
+        FrameContext* frameCtx = WaitForNextFrameResources();
+        UINT backBufferIdx = m_pSwapChain->GetCurrentBackBufferIndex();
+        frameCtx->CommandAllocator->Reset();
+
+        D3D12_RESOURCE_BARRIER barrier = {};
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = m_mainRenderTargetResource[backBufferIdx];
+        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        m_pd3dCommandList->Reset(frameCtx->CommandAllocator, nullptr);
+        m_pd3dCommandList->ResourceBarrier(1, &barrier);
+
+        // Render Dear ImGui graphics
+        const float CLEAR_COLOR_with_alpha[4] = { CLEAR_COLOR.x * CLEAR_COLOR.w, CLEAR_COLOR.y * CLEAR_COLOR.w, CLEAR_COLOR.z * CLEAR_COLOR.w, CLEAR_COLOR.w };
+        m_pd3dCommandList->ClearRenderTargetView(m_mainRenderTargetDescriptor[backBufferIdx], CLEAR_COLOR_with_alpha, 0, nullptr);
+        m_pd3dCommandList->OMSetRenderTargets(1, &m_mainRenderTargetDescriptor[backBufferIdx], FALSE, nullptr);
+        m_pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dSrvDescHeap);
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pd3dCommandList);
+        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+        m_pd3dCommandList->ResourceBarrier(1, &barrier);
+        m_pd3dCommandList->Close();
+
+        m_pd3dCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&m_pd3dCommandList);
+
+        m_pSwapChain->Present(1, 0); // Present with vsync
+        //m_pSwapChain->Present(0, 0); // Present without vsync
+
+        UINT64 fenceValue = m_fenceLastSignaledValue + 1;
+        m_pd3dCommandQueue->Signal(m_fence, fenceValue);
+        m_fenceLastSignaledValue = fenceValue;
+        frameCtx->FenceValue = fenceValue;
+    }
+
+    // UI Elements
+    void ImGuiController::demoWindow() {
+        ImGui::ShowDemoWindow();
+    }
+    void ImGuiController::createTestWindow() {
+        ImGui::Begin("Hello WORLDDDDDDDDDDD!");
+        ImGui::Text("Test text for hello world window");
+        ImGui::End();
+    }
+
+
     // private methods
     void ImGuiController::CreateApplicationWindow() {
         // Create application window

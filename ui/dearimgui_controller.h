@@ -37,16 +37,24 @@ namespace UI {
 	public:
 		ImGuiController();
 		~ImGuiController();
-		void init();
+		bool init();
+		void cleanup();
+		void newFrame();
+		void render();
+		void createTestWindow();
+		void demoWindow();
 
-		bool BackendActive();
 	private:
 		// Dear ImGui Data
 		static int const            NUM_FRAMES_IN_FLIGHT = 3;
 		static int const            NUM_BACK_BUFFERS = 3;
+		
+		const ImVec4				CLEAR_COLOR = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-		static FrameContext				m_frameContext[NUM_FRAMES_IN_FLIGHT] = {};
-		static UINT						m_frameIndex = 0;
+		static WNDCLASSEXW wc;
+		static HWND hwnd;
+		static FrameContext				m_frameContext[NUM_FRAMES_IN_FLIGHT];
+		static UINT						m_frameIndex;
 		static ID3D12Device*				m_pd3dDevice;
 		static ID3D12DescriptorHeap*		m_pd3dRtvDescHeap;
 		static ID3D12DescriptorHeap*		m_pd3dSrvDescHeap;
@@ -57,8 +65,8 @@ namespace UI {
 		static UINT64						m_fenceLastSignaledValue;
 		static IDXGISwapChain3*			m_pSwapChain;
 		static HANDLE                      m_hSwapChainWaitableObject;
-		static ID3D12Resource*				m_mainRenderTargetResource[NUM_BACK_BUFFERS] = {};
-		static D3D12_CPU_DESCRIPTOR_HANDLE m_mainRenderTargetDescriptor[NUM_BACK_BUFFERS] = {};
+		static ID3D12Resource*				m_mainRenderTargetResource[NUM_BACK_BUFFERS];
+		static D3D12_CPU_DESCRIPTOR_HANDLE m_mainRenderTargetDescriptor[NUM_BACK_BUFFERS];
 
 		static void CreateApplicationWindow();
 		static bool CreateDeviceD3D(HWND hWnd);
