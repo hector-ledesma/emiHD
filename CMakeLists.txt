@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.8)
 project ("emiHD")
-add_executable (emiHD "emiHD.cpp" "emiHD.h")
+add_executable (emiHD "emiHD.cpp" "emiHD.h" "ui/dearimgui_controller" "Application.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET emiHD PROPERTY CXX_STANDARD 20)
