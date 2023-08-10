@@ -3,14 +3,14 @@
 
 #pragma once
 #include "imgui.h"
-#include "elements/base_layout.h"
+#include "elements/root_window.h"
 
 namespace UI {
     class InterfaceController {
     public:
         InterfaceController();
         ~InterfaceController();
-        void createRootLayout(ImGuiWindowFlags flags);
+        void renderInterface();
 
     private:
     };

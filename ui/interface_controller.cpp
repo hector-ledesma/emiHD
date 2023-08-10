@@ -3,8 +3,13 @@
 namespace UI {
     InterfaceController::InterfaceController() {}
     InterfaceController::~InterfaceController() {}
-    void InterfaceController::createRootLayout(ImGuiWindowFlags flags) {
-        UI::BaseLayout layout{flags};
-        layout.render();
+
+    void InterfaceController::renderInterface() {
+        // Application layout will be placed within one full screen parent window
+        static ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDecoration;
+        UI::RootWindow root{ root_flags };
+        root.render([]() {
+            ImGui::Text("Hello World");
+            });
     }
 }

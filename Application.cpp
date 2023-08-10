@@ -25,15 +25,10 @@ namespace emiHD {
             m_imgui.newFrame();
 
             // Application UI
-            // Application layout will be placed within one full screen parent window
-            static ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDecoration;
-            m_interface.createRootLayout(root_flags);
-            {
-                m_imgui.demoWindow();
-                m_imgui.createTestWindow();
-            }
+            
+            m_interface.renderInterface();
 
-            // Rendering
+            // ImGui Rendering
             m_imgui.render();
             
         }
