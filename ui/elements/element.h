@@ -10,7 +10,7 @@ namespace UI {
     class Element {
     public:
         virtual void setFlags(int flags) { m_flags = flags; };
-        virtual void render(const std::function<void()>& lambda) {
+        virtual void render(const std::function<void()>& lambda = []{}) {
             if (begin()) {
                 style();
                 lambda();
@@ -22,7 +22,7 @@ namespace UI {
 
         virtual bool begin() = 0;
         virtual void style() = 0;
-        virtual void end() { ImGui::End(); };
+        virtual void end() = 0;
     };
 }
 #endif
