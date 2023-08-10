@@ -4,20 +4,25 @@
 #pragma once
 #include "imgui.h"
 #include <string>
+#include <functional>
 
 namespace UI {
     class Element {
     public:
-        virtual void render() = 0;
-        void setFlags(int flags) { m_flags = flags; };
-        void renderIn(std::string parent) {
-            if (ImGui::Begin(parent.c_str())) {
-                this->render();
-                ImGui::End();
+        virtual void setFlags(int flags) { m_flags = flags; };
+        virtual void render(const std::function<void()>& lambda) {
+            if (begin()) {
+                style();
+                lambda();
+                end();
             }
         };
     protected:
         int m_flags = 0;
+
+        virtual bool begin() = 0;
+        virtual void style() = 0;
+        virtual void end() { ImGui::End(); };
     };
 }
 #endif
