@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.8)
 project ("emiHD")
-add_executable (emiHD "emiHD.cpp" "emiHD.h" "ui/dearimgui_controller" "Application.cpp" "ui/elements/root_window.cpp" "ui/interface_controller.cpp" "ui/interface_controller.h" "ui/elements/element.h" "ui/elements/left_container.h" "ui/elements/left_conatiner.cpp")
+add_executable (emiHD "emiHD.cpp" "emiHD.h" "ui/dearimgui_controller" "Application.cpp" "ui/elements/root_window.cpp" "ui/interface_controller.cpp" "ui/interface_controller.h" "ui/elements/element.h" "ui/elements/left_container.h" "ui/elements/left_conatiner.cpp" "ui/elements/right_container.h" "ui/elements/right_container.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET emiHD PROPERTY CXX_STANDARD 20)

@@ -1,6 +1,7 @@
 #include "interface_controller.h"
 #include "elements/root_window.h"
 #include "elements/left_container.h"
+#include "elements/right_container.h"
 #include <string>
 namespace {
 }
@@ -16,6 +17,11 @@ namespace UI {
             ImGuiWindowFlags none_flags = ImGuiWindowFlags_None;
             UI::RootLPanel lPanel{ none_flags };
             lPanel.render();
+
+            ImGui::SameLine();
+
+            UI::RootRPanel rPanel{ none_flags };
+            rPanel.render();
             });
             // I want to use the "work area"
         /*const ImGuiViewport* viewport = ImGui::GetMainViewport();
