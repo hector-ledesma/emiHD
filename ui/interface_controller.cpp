@@ -2,6 +2,7 @@
 #include "elements/root_window.h"
 #include "elements/left_container.h"
 #include "elements/right_container.h"
+#include "elements/timer_container.h"
 #include <string>
 namespace {
 }
@@ -16,7 +17,10 @@ namespace UI {
         root.render([]{
             ImGuiWindowFlags none_flags = ImGuiWindowFlags_None;
             UI::RootLPanel lPanel{ none_flags };
-            lPanel.render();
+            lPanel.render([none_flags] {
+                UI::TimerContainer timerContainer{ none_flags };
+                timerContainer.render();
+                });
 
             ImGui::SameLine();
 
