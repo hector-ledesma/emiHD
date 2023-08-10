@@ -14,6 +14,6 @@ namespace UI {
     }
 
     void RootLPanel::style() {
-        ImGui::Text("Left Panel ");
+        ImGui::SeparatorText("Timer Container ");
     }
 }
