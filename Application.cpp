@@ -1,7 +1,7 @@
 #include "Application.h"
 
 namespace emiHD {
-    Application::Application() : m_imgui(), m_interface() {}
+    Application::Application() : m_imgui(), m_data(), m_interface(m_data) {}
     Application::~Application() {}
 
     void Application::run() {
@@ -25,9 +25,7 @@ namespace emiHD {
             m_imgui.newFrame();
 
             // Application UI
-            
             m_interface.renderInterface();
-
             // ImGui Rendering
             m_imgui.render();
             
