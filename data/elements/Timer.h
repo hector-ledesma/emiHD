@@ -3,23 +3,33 @@
 
 #pragma once
 #include <string>
+#include <chrono>
+#include <ctime>
+
+
 namespace data {
+    using std::chrono::high_resolution_clock;
     // TODO:- There should be an interface namespace Timer with limited constructor and methods that
     //      the backend controller translates for storage.
     class Timer {
     public:
-        std::string getDate();
+        Timer(int id, std::time_t date, std::string title, std::string comments,
+            high_resolution_clock::time_point startTime, high_resolution_clock::time_point endTime);
+
+        int getId();
+        std::time_t getDate();
         std::string getTitle();
         std::string getComments();
-        std::string getStartTime();
-        std::string getEndTime();
-        std::string getDuration();
+        high_resolution_clock::time_point getStartTime();
+        high_resolution_clock::time_point getEndTime();
+        float getDuration();
     private:
-        std::string m_date;
+        int m_id;
         std::string m_title;
+        std::time_t m_date;
+        high_resolution_clock::time_point m_startTime;
+        high_resolution_clock::time_point m_endTime;
         std::string m_comments; // Will be its own data structure down the line
-        std::string m_startTime;
-        std::string m_endTime;
     };
 }
 
