@@ -3,15 +3,17 @@
 
 #pragma once
 #include "imgui.h"
+#include "../data/data_controller.h"
 
 namespace UI {
     class InterfaceController {
     public:
-        InterfaceController();
+        InterfaceController(data::DataController dataController);
         ~InterfaceController();
         void renderInterface();
 
     private:
+        data::DataController m_dataController;
     };
 }
 

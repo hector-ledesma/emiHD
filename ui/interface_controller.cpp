@@ -3,23 +3,36 @@
 #include "elements/left_container.h"
 #include "elements/right_container.h"
 #include "elements/timer_container.h"
-#include <string>
+#include "elements/active_timer.h"
+#include "string"
+
 namespace {
 }
 namespace UI {
-    InterfaceController::InterfaceController() {}
+    InterfaceController::InterfaceController(data::DataController dataController) :
+        m_dataController(dataController)
+    {}
     InterfaceController::~InterfaceController() {}
 
     void InterfaceController::renderInterface() {
         // Application layout will be placed within one full screen parent window
         static ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDecoration;
         UI::RootWindow root{ root_flags };
-        root.render([]{
+        root.render([this]{
             ImGuiWindowFlags none_flags = ImGuiWindowFlags_None;
             UI::RootLPanel lPanel{ none_flags };
-            lPanel.render([none_flags] {
+            lPanel.render([this, none_flags] {
                 UI::TimerContainer timerContainer{ none_flags };
-                timerContainer.render();
+            timerContainer.render([this, none_flags] {
+                if (ImGui::Button("Start New Timer")) {
+                    // Logic controller create new timer here
+                }
+                // Create a Timer Element for each active timer
+                for (const auto &timer : m_dataController.getActiveTimers())
+                {
+                    UI::Timer(none_flags, timer).render();
+                }
+                });
                 });
 
             ImGui::SameLine();
