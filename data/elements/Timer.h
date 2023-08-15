@@ -28,6 +28,7 @@ namespace data {
         system_clock::time_point getEndTime();
         float getDuration();
         bool isRunning();
+        void updateTime(system_clock::time_point time);
 
         static std::string dateToString(const std::chrono::time_point<system_clock>& time) {
             return std::vformat("{:%m/%d/%Y %H:%M}", std::make_format_args(time));

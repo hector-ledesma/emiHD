@@ -33,4 +33,7 @@ namespace data {
     bool Timer::isRunning() {
         return m_endTime == TIMER_RUNNING;
     }
+    void Timer::updateTime(system_clock::time_point time) {
+        m_startTime = time;
+    }
 }
