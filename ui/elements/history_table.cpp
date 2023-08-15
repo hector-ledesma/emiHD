@@ -26,12 +26,12 @@ namespace UI {
         ImGui::TableSetupColumn("Date");
         //ImGui::TableSetupColumn("Comments");
         ImGui::TableSetupColumn("Start");
-        ImGui::TableSetupColumn("End");
+        //ImGui::TableSetupColumn("End");
         ImGui::TableSetupColumn("Duration");
 
         ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 
-        for (int column = 0; column < 5; column++) {
+        for (int column = 0; column < 4; column++) {
             ImGui::TableSetColumnIndex(column);
             const char* column_name = ImGui::TableGetColumnName(column); // Retrieve named passed to TableSetupColumn()
             ImGui::PushID(column);
@@ -60,18 +60,16 @@ namespace UI {
             // Start
             ImGui::TableSetColumnIndex(2);
             ImGui::Text(data::Timer::dateToString(timer.getStartTime()).c_str());
-            // End
-            ImGui::TableSetColumnIndex(3);
-            ImGui::Text(data::Timer::dateToString(timer.getEndTime()).c_str());
+            
             // Duration
-            ImGui::TableSetColumnIndex(4);
+            ImGui::TableSetColumnIndex(3);
             if (timer.isRunning()) {
                 ImGui::Text("Running");
             }
             else {
-                std::chrono::time_point<std::chrono::system_clock> elapsed{ timer.getEndTime() - timer.getStartTime() };
                 //std::string s = std::vformat("{:%d %H:%M:%S}")
-                ImGui::Text(data::Timer::durationToString(elapsed).c_str());
+                const auto duration = std::chrono::system_clock::time_point{ timer.getDuration() };
+                ImGui::Text(data::Timer::durationToString(duration).c_str());
             }
         }
     }

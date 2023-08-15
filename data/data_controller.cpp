@@ -18,7 +18,8 @@ namespace data {
         }
         // completed timers
         for (int i = 0; i < 15; i++) {
-            auto new_timer = data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart, g_appStart + 2111h + 155s);
+            std::chrono::system_clock::time_point end{ g_appStart + 2111h + 15s };
+            auto new_timer = data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart, end - g_appStart);
             m_timers.push_back(new_timer);
         }
     }
@@ -29,7 +30,7 @@ namespace data {
     std::vector<Timer> DataController::getActiveTimers() {
         std::vector<Timer> timers;
         for (auto& timer : m_timers) {
-            if (timer.getEndTime() <= timer.getStartTime()) {
+            if (timer.isRunning()) {
                 timers.push_back(timer);
             }
         }

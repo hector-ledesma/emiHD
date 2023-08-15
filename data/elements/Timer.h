@@ -9,7 +9,7 @@
 // MACROS can be defined for: Defining an end time value when timer is "active",
 //  checking if timer is active.
 using namespace std::chrono_literals;
-constexpr std::chrono::time_point<std::chrono::system_clock> TIMER_RUNNING{0s};
+constexpr std::chrono::system_clock::duration TIMER_RUNNING{0s};
 
 namespace data {
     using std::chrono::system_clock;
@@ -18,15 +18,14 @@ namespace data {
     class Timer {
     public:
         Timer(int id, system_clock::time_point date, std::string title, std::string comments,
-            system_clock::time_point startTime, system_clock::time_point endTime = TIMER_RUNNING);
+            system_clock::time_point startTime, system_clock::duration duration = TIMER_RUNNING);
 
         int getId();
         system_clock::time_point getDate();
         std::string getTitle();
         std::string getComments();
         system_clock::time_point getStartTime();
-        system_clock::time_point getEndTime();
-        float getDuration();
+        system_clock::duration getDuration();
         bool isRunning();
         void updateTime(system_clock::time_point time);
 
@@ -47,7 +46,7 @@ namespace data {
         std::string m_title; // Title should eventually be replaced with "tasks"/"tags"
         system_clock::time_point m_date;
         system_clock::time_point m_startTime;
-        system_clock::time_point m_endTime;
+        system_clock::duration m_duration;
         std::string m_comments; // Will be its own data structure down the line
     };
 }
