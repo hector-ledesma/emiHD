@@ -6,8 +6,12 @@
 #include "elements/active_timer.h"
 #include "elements/history_table.h"
 #include <string>
+#include <unordered_map>
 
 namespace {
+    #define TIMER_ID_FOR(id) (TIMER_ELEMENT_ID+id)
+
+    static std::unordered_map<std::string, UI::Timer> timer_cells;
 }
 namespace UI {
     InterfaceController::InterfaceController(data::DataController dataController) :
@@ -35,10 +39,18 @@ namespace UI {
                         m_dataController.createTimer(title);
                     }
                 }
+
+                
                 // Create a Timer Element for each active timer
-                for (const auto &timer : m_dataController.getActiveTimers())
+
+                // For each active timer, we'll create a cell instance that we'll cache
+                for (auto &timer : m_dataController.getActiveTimers())
                 {
-                    UI::Timer(none_flags, timer).render();
+                    std::string id = TIMER_ID_FOR(timer.getId());
+                    if (!timer_cells.contains(id)) {
+                        timer_cells.insert(std::make_pair(id, UI::Timer(none_flags, timer)));
+                    }
+                    timer_cells.at(id).render();
                 }
                 //});
                 });
