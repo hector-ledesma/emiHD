@@ -8,6 +8,7 @@ namespace data {
     class TimerController {
     public:
         virtual std::vector<Timer> getActiveTimers() { return std::vector<Timer>(); };
+        virtual std::vector<Timer> getAllTimers() { return std::vector<Timer>(); }
     private:
     };
 
