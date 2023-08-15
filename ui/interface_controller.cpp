@@ -4,7 +4,8 @@
 #include "elements/right_container.h"
 #include "elements/timer_container.h"
 #include "elements/active_timer.h"
-#include "string"
+#include "elements/history_table.h"
+#include <string>
 
 namespace {
 }
@@ -23,7 +24,7 @@ namespace UI {
             UI::RootLPanel lPanel{ none_flags };
             lPanel.render([this, none_flags] {
                 UI::TimerContainer timerContainer{ none_flags };
-            timerContainer.render([this, none_flags] {
+            //timerContainer.render([this, none_flags] {
                 if (ImGui::Button("Start New Timer")) {
                     // Logic controller create new timer here
                 }
@@ -32,13 +33,17 @@ namespace UI {
                 {
                     UI::Timer(none_flags, timer).render();
                 }
-                });
+                //});
                 });
 
             ImGui::SameLine();
 
             UI::RootRPanel rPanel{ none_flags };
-            rPanel.render();
+            rPanel.render([this] {
+                ImGuiTableFlags table_flags = ImGuiTableFlags_Borders | ImGuiTableFlags_NoSavedSettings;
+                UI::HistoryTable history{ table_flags, m_dataController.getAllTimers() };
+                history.render();
+                });
             });
             // I want to use the "work area"
         /*const ImGuiViewport* viewport = ImGui::GetMainViewport();

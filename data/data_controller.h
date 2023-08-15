@@ -12,7 +12,9 @@ namespace data
         DataController();
         ~DataController();
         std::vector<Timer> getActiveTimers();
+        std::vector<Timer> getAllTimers();
     private:
+        std::vector<Timer> m_timers;
     };
 
 }
