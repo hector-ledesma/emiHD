@@ -13,17 +13,19 @@ namespace data {
         using namespace std::chrono_literals;
         // active timers
         for (int i = 0; i < 3; i++) {
-            auto new_timer = data::Timer(i, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart);
+            auto new_timer = data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart);
             m_timers.push_back(new_timer);
         }
         // completed timers
         for (int i = 0; i < 15; i++) {
-            auto new_timer = data::Timer(i+3, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart, g_appStart + 2111h + 155s);
+            auto new_timer = data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart, g_appStart + 2111h + 155s);
             m_timers.push_back(new_timer);
         }
     }
     DataController::~DataController() {
     }
+
+    // TimerController conformance
     std::vector<Timer> DataController::getActiveTimers() {
         std::vector<Timer> timers;
         for (auto& timer : m_timers) {
@@ -35,5 +37,10 @@ namespace data {
     }
     std::vector<Timer> DataController::getAllTimers() {
         return m_timers;
+    }
+
+    void DataController::createTimer(std::string title) {
+        auto now = std::chrono:: system_clock::now();
+        m_timers.push_back(data::Timer(id_count++, now, title, "", now));
     }
 }
