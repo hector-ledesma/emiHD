@@ -20,28 +20,20 @@ namespace UI {
 
     void Timer::style() {
         ImGui::SeparatorText(m_timer.getTitle().c_str());
-        char buf[256];
-        // Timer runtime
-        typedef std::chrono::high_resolution_clock clock;
-        typedef std::chrono::duration<float, std::milli> duration;
-
-        duration elapsed = clock::now() - m_timer.getStartTime();
-        std::string s = std::to_string(elapsed.count());
-        ImGui::PushItemWidth(120.0f);
-        ImGui::InputText("##", &s);
-        ImGui::SameLine();
-        ImGui::Button("Play/Pause");
         // Date
-        const auto date = m_timer.getDate();
-        auto timer_date = std::ctime(&date);
-        sprintf_s(buf, "Date: %s", timer_date);
-        ImGui::Text(buf); 
+        ImGui::Text(data::Timer::dateToString(m_timer.getDate()).c_str());
+        // Timer runtime
+        std::chrono::system_clock::time_point elapsed{ std::chrono::system_clock::now() - m_timer.getStartTime() };
+        ImGui::Text(data::Timer::durationToString(elapsed).c_str());
 
-        //// Start time
-        //const auto tp = m_timer.getStartTime();
-        //std::string s = std::format("{%H%M}", tp);
-        ////sprintf_s(buf, "Start Time: %s", s.c_str());
-        //ImGui::Text(buf);
+        ImGui::SameLine();
+        if (ImGui::Button("Play/Pause")) {
+            // Play pause functionality
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Stop")) {
+            // Stop timer functionality
+        }
 
     }
 }
