@@ -7,11 +7,12 @@
 #include "elements/history_table.h"
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
+#include <iostream>
 
 namespace {
-    #define TIMER_ID_FOR(id) (TIMER_ELEMENT_ID+id)
 
-    static std::unordered_map<std::string, UI::Timer> timer_cells;
+    static std::unordered_map<std::string, std::shared_ptr<UI::Timer>> timer_cells;
 }
 namespace UI {
     InterfaceController::InterfaceController(data::DataController dataController) :
@@ -23,7 +24,8 @@ namespace UI {
         // Application layout will be placed within one full screen parent window
         static ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDecoration;
         UI::RootWindow root{ root_flags };
-        root.render([this]{
+        static auto& timers = m_dataController.getAllTimers();
+        root.render([this] {
             ImGuiWindowFlags none_flags = ImGuiWindowFlags_None;
             UI::RootLPanel lPanel{ none_flags };
             lPanel.render([this, none_flags] {
@@ -32,35 +34,34 @@ namespace UI {
             static char new_timer_title[256];
             ImGui::InputTextWithHint("##", "Timer Title", new_timer_title, IM_ARRAYSIZE(new_timer_title));
             ImGui::SameLine();
-                if (ImGui::Button("New Timer")) {
-                    // Logic controller create new timer here
-                    std::string title =new_timer_title;
-                    if (!title.empty()) {
-                        m_dataController.createTimer(title);
-                    }
+            if (ImGui::Button("New Timer")) {
+                // Logic controller create new timer here
+                std::string title = new_timer_title;
+                if (!title.empty()) {
+                    m_dataController.createTimer(title);
                 }
-
-                
-                // Create a Timer Element for each active timer
-
-                // For each active timer, we'll create a cell instance that we'll cache
-                for (auto &timer : m_dataController.getActiveTimers())
-                {
-                    std::string id = TIMER_ID_FOR(timer.getId());
-                    if (!timer_cells.contains(id)) {
-                        timer_cells.insert(std::make_pair(id, UI::Timer(none_flags, timer)));
-                    }
-                    timer_cells.at(id).render();
+            }
+            
+            // For each active timer, we'll create a cell instance that we'll cache
+            for (auto& timer : timers)
+            {
+                if (!timer->isRunning()) continue;
+                std::string id = TIMER_ELEMENT_ID + std::to_string(timer->getId());
+                std::cout << id << "\n";
+                if (!timer_cells.contains(id)) {
+                    timer_cells.insert(std::make_pair(id, std::make_shared<UI::Timer>(UI::Timer(none_flags, timer))));
                 }
-                //});
-                });
+                timer_cells.at(id)->render();
+            }
+            });
+
 
             ImGui::SameLine();
 
             UI::RootRPanel rPanel{ none_flags };
             rPanel.render([this] {
                 ImGuiTableFlags table_flags = ImGuiTableFlags_Borders | ImGuiTableFlags_NoSavedSettings;
-                UI::HistoryTable history{ table_flags, m_dataController.getAllTimers() };
+                UI::HistoryTable history{ table_flags, timers };
                 history.render();
                 });
             });

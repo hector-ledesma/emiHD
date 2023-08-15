@@ -9,7 +9,7 @@ namespace {
 }
 
 namespace UI {
-    HistoryTable::HistoryTable(ImGuiWindowFlags flags, std::vector<data::Timer> timers) : m_timers(timers) {
+    HistoryTable::HistoryTable(ImGuiWindowFlags flags, const std::list<std::shared_ptr<data::Timer>>& timers) : m_timers(timers) {
         setFlags(flags);
     }
 
@@ -46,12 +46,12 @@ namespace UI {
 
             // Title
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text(timer.getTitle().c_str());
+            ImGui::Text(timer->getTitle().c_str());
 
             // Date
             ImGui::TableSetColumnIndex(1);
             //const auto date = timer.getDate();
-            ImGui::Text(data::Timer::dateToString(timer.getDate()).c_str());
+            ImGui::Text(data::Timer::dateToString(timer->getDate()).c_str());
 
             // Comments
             /*ImGui::TableSetColumnIndex(2);
@@ -59,16 +59,16 @@ namespace UI {
 
             // Start
             ImGui::TableSetColumnIndex(2);
-            ImGui::Text(data::Timer::dateToString(timer.getStartTime()).c_str());
+            ImGui::Text(data::Timer::dateToString(timer->getStartTime()).c_str());
             
             // Duration
             ImGui::TableSetColumnIndex(3);
-            if (timer.isRunning()) {
+            if (timer->isRunning()) {
                 ImGui::Text("Running");
             }
             else {
                 //std::string s = std::vformat("{:%d %H:%M:%S}")
-                const auto duration = std::chrono::system_clock::time_point{ timer.getDuration() };
+                const auto duration = std::chrono::system_clock::time_point{ timer->getDuration() };
                 ImGui::Text(data::Timer::durationToString(duration).c_str());
             }
         }
