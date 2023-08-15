@@ -2,15 +2,19 @@
 #define TIMER_CONTROLLER_H_INCLUDED
 
 #pragma once
-#include <vector>
+//#include <vector>
 #include "elements/Timer.h"
+#include <list>
+#include <memory>
+
 namespace data {
     class TimerController {
     public:
         virtual std::vector<Timer> getActiveTimers() { return std::vector<Timer>(); };
-        virtual std::vector<Timer> getAllTimers() { return std::vector<Timer>(); }
+        const virtual std::list<std::shared_ptr<Timer>>& getAllTimers() const { return m_timers; }
         virtual void createTimer(std::string title) = 0;
-    private:
+    protected:
+        std::list<std::shared_ptr<Timer>> m_timers;
     };
 
 }

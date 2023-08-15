@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <chrono>
+#include <memory>
 #include "elements/Timer.h"
 
 namespace data {
@@ -13,13 +14,13 @@ namespace data {
         using namespace std::chrono_literals;
         // active timers
         for (int i = 0; i < 3; i++) {
-            auto new_timer = data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart);
+            auto new_timer = std::make_shared<Timer>( data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart) );
             m_timers.push_back(new_timer);
         }
         // completed timers
         for (int i = 0; i < 15; i++) {
             std::chrono::system_clock::time_point end{ g_appStart + 2111h + 15s };
-            auto new_timer = data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart, end - g_appStart);
+            auto new_timer = std::make_shared<Timer>( data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart, end - g_appStart));
             m_timers.push_back(new_timer);
         }
     }
@@ -27,7 +28,7 @@ namespace data {
     }
 
     // TimerController conformance
-    std::vector<Timer> DataController::getActiveTimers() {
+    /*std::vector<Timer> DataController::getActiveTimers() {
         std::vector<Timer> timers;
         for (auto& timer : m_timers) {
             if (timer.isRunning()) {
@@ -35,13 +36,13 @@ namespace data {
             }
         }
         return timers;
-    }
-    std::vector<Timer> DataController::getAllTimers() {
+    }*/
+    /*std::vector<Timer>& DataController::getAllTimers() {
         return m_timers;
-    }
+    }*/
 
     void DataController::createTimer(std::string title) {
         auto now = std::chrono:: system_clock::now();
-        m_timers.push_back(data::Timer(id_count++, now, title, "", now));
+        m_timers.push_back(std::make_shared<Timer>(data::Timer(id_count++, now, title, "", now)));
     }
 }
