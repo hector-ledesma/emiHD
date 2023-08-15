@@ -8,29 +8,32 @@ namespace data {
     {
     }
 
-    int Timer::getId() {
+    int Timer::getId() const {
         return m_id;
     }
-    system_clock::time_point Timer::getDate() {
+    system_clock::time_point Timer::getDate() const {
         return m_date;
     }
-    std::string Timer::getTitle() {
+    std::string Timer::getTitle() const {
         return m_title;
     }
-    std::string Timer::getComments() {
+    std::string Timer::getComments() const {
         return m_comments;
     }
-    system_clock::time_point Timer::getStartTime() {
+    system_clock::time_point Timer::getStartTime() const {
         return m_startTime;
     }
-    system_clock::duration Timer::getDuration() {
+    system_clock::duration Timer::getDuration() const {
         return m_duration;
     }
     
-    bool Timer::isRunning() {
-        return m_duration== TIMER_RUNNING;
+    bool Timer::isRunning() const {
+        return m_duration == TIMER_RUNNING;
     }
-    void Timer::updateTime(system_clock::time_point time) {
+    void Timer::updateTime(system_clock::time_point time) const {
         m_startTime = time;
+    }
+    void Timer::setDuration(system_clock::duration duration) const {
+        m_duration = duration;
     }
 }

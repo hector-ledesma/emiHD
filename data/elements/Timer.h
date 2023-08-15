@@ -20,14 +20,15 @@ namespace data {
         Timer(int id, system_clock::time_point date, std::string title, std::string comments,
             system_clock::time_point startTime, system_clock::duration duration = TIMER_RUNNING);
 
-        int getId();
-        system_clock::time_point getDate();
-        std::string getTitle();
-        std::string getComments();
-        system_clock::time_point getStartTime();
-        system_clock::duration getDuration();
-        bool isRunning();
-        void updateTime(system_clock::time_point time);
+        int getId() const;
+        system_clock::time_point getDate() const;
+        std::string getTitle() const;
+        std::string getComments() const;
+        system_clock::time_point getStartTime() const;
+        system_clock::duration getDuration() const;
+        bool isRunning() const;
+        void updateTime(system_clock::time_point time) const;
+        void setDuration(system_clock::duration duration) const;
 
         static std::string dateToString(const std::chrono::time_point<system_clock>& time) {
             return std::vformat("{:%m/%d/%Y %H:%M}", std::make_format_args(time));
@@ -45,8 +46,8 @@ namespace data {
         int m_id;
         std::string m_title; // Title should eventually be replaced with "tasks"/"tags"
         system_clock::time_point m_date;
-        system_clock::time_point m_startTime;
-        system_clock::duration m_duration;
+        mutable system_clock::time_point m_startTime;
+        mutable system_clock::duration m_duration;
         std::string m_comments; // Will be its own data structure down the line
     };
 }
