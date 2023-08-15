@@ -27,6 +27,10 @@ namespace data {
         system_clock::time_point getEndTime();
         float getDuration();
         bool isRunning();
+
+        static std::string dateToString(const std::chrono::time_point<system_clock>& time) {
+            return std::vformat("{:%T}", std::make_format_args(time));
+        };
     private:
         int m_id;
         std::string m_title; // Title should eventually be replaced with "tasks"/"tags"
