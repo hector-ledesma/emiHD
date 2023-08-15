@@ -2,7 +2,7 @@
 
 namespace data {
 
-    Timer::Timer(int id, std::time_t date, std::string title, std::string comments,
+    Timer::Timer(int id, system_clock::time_point date, std::string title, std::string comments,
         system_clock::time_point startTime, system_clock::time_point endTime) :
         m_id(id), m_date(date), m_title(title), m_comments(comments), m_startTime(startTime), m_endTime(endTime)
     {
@@ -11,7 +11,7 @@ namespace data {
     int Timer::getId() {
         return m_id;
     }
-    std::time_t Timer::getDate() {
+    system_clock::time_point Timer::getDate() {
         return m_date;
     }
     std::string Timer::getTitle() {

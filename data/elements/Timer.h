@@ -17,11 +17,11 @@ namespace data {
     //      the backend controller translates for storage.
     class Timer {
     public:
-        Timer(int id, std::time_t date, std::string title, std::string comments,
+        Timer(int id, system_clock::time_point date, std::string title, std::string comments,
             system_clock::time_point startTime, system_clock::time_point endTime = TIMER_RUNNING);
 
         int getId();
-        std::time_t getDate();
+        system_clock::time_point getDate();
         std::string getTitle();
         std::string getComments();
         system_clock::time_point getStartTime();
@@ -44,7 +44,7 @@ namespace data {
     private:
         int m_id;
         std::string m_title; // Title should eventually be replaced with "tasks"/"tags"
-        std::time_t m_date;
+        system_clock::time_point m_date;
         system_clock::time_point m_startTime;
         system_clock::time_point m_endTime;
         std::string m_comments; // Will be its own data structure down the line
