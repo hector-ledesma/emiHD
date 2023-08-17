@@ -16,11 +16,7 @@ namespace UI {
         void style();
     private:
         std::shared_ptr<data::Timer> m_timer;
-        std::chrono::system_clock::time_point paused_at;
         bool m_paused = false;
-
-        void togglePause();
-        void stopTimer();
     };
 }
 #endif

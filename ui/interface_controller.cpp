@@ -10,10 +10,6 @@
 #include <unordered_set>
 #include <iostream>
 
-namespace {
-
-    static std::unordered_map<std::string, std::shared_ptr<UI::Timer>> timer_cells;
-}
 namespace UI {
     InterfaceController::InterfaceController(data::DataController dataController) :
         m_dataController(dataController)
@@ -42,16 +38,11 @@ namespace UI {
                 }
             }
             
-            // For each active timer, we'll create a cell instance that we'll cache
-            for (auto& timer : timers)
-            {
-                if (!timer->isRunning()) continue;
-                std::string id = TIMER_ELEMENT_ID + std::to_string(timer->getId());
-                std::cout << id << "\n";
-                if (!timer_cells.contains(id)) {
-                    timer_cells.insert(std::make_pair(id, std::make_shared<UI::Timer>(UI::Timer(none_flags, timer))));
+            for (auto& timer : timers) {
+                if (timer->isRunning()) {
+                    UI::Timer active_timer(none_flags, timer);
+                    active_timer.render();
                 }
-                timer_cells.at(id)->render();
             }
             });
 

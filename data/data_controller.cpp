@@ -20,26 +20,13 @@ namespace data {
         // completed timers
         for (int i = 0; i < 15; i++) {
             std::chrono::system_clock::time_point end{ g_appStart + 2111h + 15s };
-            auto new_timer = std::make_shared<Timer>( data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart, end - g_appStart));
+            auto new_timer = std::make_shared<Timer>( data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart));
+            new_timer->stop();
             m_timers.push_back(new_timer);
         }
     }
     DataController::~DataController() {
     }
-
-    // TimerController conformance
-    /*std::vector<Timer> DataController::getActiveTimers() {
-        std::vector<Timer> timers;
-        for (auto& timer : m_timers) {
-            if (timer.isRunning()) {
-                timers.push_back(timer);
-            }
-        }
-        return timers;
-    }*/
-    /*std::vector<Timer>& DataController::getAllTimers() {
-        return m_timers;
-    }*/
 
     void DataController::createTimer(std::string title) {
         auto now = std::chrono:: system_clock::now();
