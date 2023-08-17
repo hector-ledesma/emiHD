@@ -11,11 +11,11 @@ namespace UI {
     public:
         virtual void setFlags(int flags) { m_flags = flags; };
         virtual void render(const std::function<void()>& lambda = []{}) {
-            if (begin()) {
-                style();
-                lambda();
-                end();
-            }
+            begin();
+            style();
+            lambda();
+            end();
+            
         };
     protected:
         int m_flags = 0;
