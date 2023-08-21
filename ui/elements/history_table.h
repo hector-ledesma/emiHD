@@ -3,21 +3,22 @@
 
 #pragma once
 #include "element.h"
-//#include <vector>
-#include <list>
+#include <set>
+//#include <list>
 #include "../data/elements/Timer.h"
+#include "../data/TIMER_SET.h"
 
 #define HISTORY_TABLE_ID "history_table"
 namespace UI {
     class HistoryTable : public Element {
     public:
-        HistoryTable(ImGuiWindowFlags flags, const std::list<std::shared_ptr<data::Timer>>& timers);
+        HistoryTable(ImGuiWindowFlags flags, const TIMER_SET& timers);
     protected:
         bool begin();
         void end();
         void style();
     private:
-        std::list<std::shared_ptr<data::Timer>> m_timers;
+        TIMER_SET m_timers;
     };
 }
 #endif

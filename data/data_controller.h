@@ -13,6 +13,7 @@ namespace data
         ~DataController();
         //std::vector<Timer> getActiveTimers();
         //std::vector<Timer>& getAllTimers();
+        //const std::list<std::shared_ptr<Timer>>& getAllTimers() const;
         void createTimer(std::string title);
     private:
         //std::vector<Timer> m_timers;

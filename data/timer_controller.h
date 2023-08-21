@@ -4,17 +4,19 @@
 #pragma once
 //#include <vector>
 #include "elements/Timer.h"
-#include <list>
-#include <memory>
+#include "TIMER_SET.h"
+#include <set>
+#include <vector>
 
+using std::shared_ptr;
 namespace data {
     class TimerController {
     public:
         virtual std::vector<Timer> getActiveTimers() { return std::vector<Timer>(); };
-        const virtual std::list<std::shared_ptr<Timer>>& getAllTimers() const { return m_timers; }
+        const virtual TIMER_SET& getAllTimers() const { return m_timers; }
         virtual void createTimer(std::string title) = 0;
     protected:
-        std::list<std::shared_ptr<Timer>> m_timers;
+        TIMER_SET m_timers;
     };
 
 }

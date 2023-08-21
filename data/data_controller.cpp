@@ -14,22 +14,23 @@ namespace data {
         using namespace std::chrono_literals;
         // active timers
         for (int i = 0; i < 3; i++) {
-            auto new_timer = std::make_shared<Timer>( data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart) );
-            m_timers.push_back(new_timer);
+            auto new_timer = std::make_shared<Timer>( data::Timer(id_count++, g_appStart, "Purple", "Quota completed and other business idk.", g_appStart) );
+            m_timers.insert(new_timer);
         }
         // completed timers
         for (int i = 0; i < 15; i++) {
             std::chrono::system_clock::time_point end{ g_appStart + 2111h + 15s };
             auto new_timer = std::make_shared<Timer>( data::Timer(id_count++, g_appStart, "Studying", "Quota completed and other business idk.", g_appStart));
             new_timer->stop();
-            m_timers.push_back(new_timer);
+            m_timers.insert(new_timer);
         }
     }
     DataController::~DataController() {
     }
 
+
     void DataController::createTimer(std::string title) {
         auto now = std::chrono:: system_clock::now();
-        m_timers.push_back(std::make_shared<Timer>(data::Timer(id_count++, now, title, "", now)));
+        m_timers.insert(std::make_shared<Timer>(data::Timer(id_count++, now, title, "", now)));
     }
 }

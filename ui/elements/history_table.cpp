@@ -2,6 +2,7 @@
 #include "cpp/imgui_stdlib.h"
 #include <ctime>
 #include <string>
+#include "../data/TIMER_SET.h"
 
 namespace {
     typedef std::chrono::high_resolution_clock clock;
@@ -9,7 +10,7 @@ namespace {
 }
 
 namespace UI {
-    HistoryTable::HistoryTable(ImGuiWindowFlags flags, const std::list<std::shared_ptr<data::Timer>>& timers) : m_timers(timers) {
+    HistoryTable::HistoryTable(ImGuiWindowFlags flags, const TIMER_SET& timers) : m_timers(timers) {
         setFlags(flags);
     }
 
