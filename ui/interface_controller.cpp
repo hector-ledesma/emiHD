@@ -35,6 +35,7 @@ namespace UI {
                 std::string title = new_timer_title;
                 if (!title.empty()) {
                     m_dataController.createTimer(title);
+                    memset(new_timer_title, 0, 256);
                 }
             }
             
