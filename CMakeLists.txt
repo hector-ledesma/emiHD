@@ -19,10 +19,6 @@ file(GLOB UI_ELEMENT_SOURCE_FILES ${UI_ELEMENTS_DIR}/*.h ${UI_ELEMENTS_DIR}/*.cp
 #add_library(emiHD_ui INTERFACE)
 target_sources(emiHD PUBLIC ${UI_SOURCE_FILES})
 target_sources(emiHD PUBLIC ${UI_ELEMENT_SOURCE_FILES})
-#target_include_directories(emiHD PUBLIC
-#	${UI_ROOT_DIR}
-#	${UI_ELEMENTS_DIR}
-#)
 ## ui source END	---
 
 ## business logic source		---
@@ -35,10 +31,6 @@ file(GLOB BACKEND_ELEMENTS_SOURCE_FILES ${BACKEND_ELEMENTS_DIR}/*.h ${BACKEND_EL
 #add_library(emiHD_backend INTERFACE)
 target_sources(emiHD PUBLIC ${BACKEND_SOURCE_FILES})
 target_sources(emiHD PUBLIC ${BACKEND_ELEMENTS_SOURCE_FILES})
-#target_include_directories(emiHD PUBLIC
-#	${BACKEND_ROOT_DIR}
-#	${BACKEND_ELEMENTS_DIR}
-#)
 ## business logic source END	---
 
 ## imgui ---
@@ -62,6 +54,7 @@ target_include_directories(imgui INTERFACE
 	${IMGUI_BACKENDS_DIR}
 	${IMGUI_MISC_DIR}
 )
+
 # link libraries
 target_link_libraries(imgui INTERFACE 
 	d3d12 
@@ -71,6 +64,18 @@ target_link_libraries(imgui INTERFACE
 	dxcompiler
 )
 
+
 ## imgui END --
+
+
+set(SQLITE_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/sqlite")
+message("SQLITE Dir ${SQLITE_SRC_DIR}" )
+file(GLOB SQLITE_SRC_FILES ${SQLITE_SRC_DIR}/*.h ${SQLITE_SRC_DIR}/*.c)
+message("SQLITE Source files ${SQLITE_SRC_FILES}" )
+
+target_include_directories(emiHD PUBLIC ${SQLITE_SRC_DIR})
+target_link_directories(emiHD PUBLIC ${SQLITE_SRC_DIR})
+target_sources(emiHD PUBLIC ${SQLITE_SRC_FILES})
+
 
 target_link_libraries(emiHD imgui)
