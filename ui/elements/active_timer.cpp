@@ -4,7 +4,7 @@
 #include "cpp/imgui_stdlib.h"
 
 namespace UI {
-    Timer::Timer(ImGuiWindowFlags flags,const std::shared_ptr<data::Timer> timer) : m_timer(timer) {
+    Timer::Timer(ImGuiWindowFlags flags, const std::shared_ptr<data::Timer> timer, const std::shared_ptr<data::DataController> data) : m_timer(timer), m_data(data) {
         setFlags(flags);
     }
 
@@ -29,12 +29,12 @@ namespace UI {
         ImGui::SameLine();
         if (ImGui::Button("Play/Pause")) {
             // Play pause functionality
-            m_timer->togglePause();
+            m_data->updateState(m_timer, data::TimerState_::PLAY_PAUSE);
         }
         ImGui::SameLine();
         if (ImGui::Button("Stop")) {
             // Stop timer functionality
-            m_timer->stop();
+            m_data->updateState(m_timer, data::TimerState_::STOP);
         }
 
     }

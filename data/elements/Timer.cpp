@@ -7,6 +7,9 @@ namespace data {
     Timer::TimerDuration::TimerDuration(clock::time_point startTime, TimerState_ state) : m_state(state), m_start(startTime) {
 
     }
+    Timer::TimerDuration::TimerDuration(clock::time_point startTime, clock::time_point elapsed, clock::time_point pausedAt, TimerState_ state) : m_state(state), m_start(startTime), m_elapsed(elapsed), m_pausedAt(pausedAt) {
+
+    }
 
     TimerState_ Timer::TimerDuration::getState() const {
         return m_state;
@@ -48,12 +51,78 @@ namespace data {
         return getState();
     }
 
+    clock::time_point Timer::TimerDuration::getElapsed() {
+        return m_elapsed;
+    }
+    clock::time_point Timer::TimerDuration::getPausedAt() {
+        return m_pausedAt;
+    }
+
+    int Timer::TimerDuration::bindToStmt(sqlite3_stmt* stmt) {
+        int rc = SQLITE_OK;
+        std::string state = "STOP";
+        switch (m_state)
+        {
+        case TimerState_::PAUSE:
+            state = "PAUSE";
+            break;
+        case TimerState_::PLAY:
+            state = "PLAY";
+            break;
+        default:
+            break;
+        }
+        rc = sqlite3_bind_text(stmt, static_cast<update_val>(UPDATE_BINDING::STATE), state.c_str(), state.size() + 1, SQLITE_TRANSIENT);
+        if (rc != SQLITE_OK) return rc;
+        // Bind Duration
+        rc = sqlite3_bind_int64(stmt, static_cast<update_val>(UPDATE_BINDING::DURATION), m_start.time_since_epoch().count());
+        if (rc != SQLITE_OK) return rc;
+        // Bind Elapsed
+        rc = sqlite3_bind_int64(stmt, static_cast<update_val>(UPDATE_BINDING::ELAPSED), m_elapsed.time_since_epoch().count());
+        if (rc != SQLITE_OK) return rc;
+        // Bind Paused
+        rc = sqlite3_bind_int64(stmt, static_cast<update_val>(UPDATE_BINDING::PAUSED), m_pausedAt.time_since_epoch().count());
+        return rc;
+    }
+
 
     // Timer
     Timer::Timer(int id, system_clock::time_point date, std::string title, std::string comments,
         system_clock::time_point startTime, TimerState_ state) :
         m_id(id), m_date(date), m_title(title), m_comments(comments), m_duration{startTime, state}
     {
+    }
+
+    Timer::Timer(int id, clock::time_point start, std::string title, clock::time_point duration, clock::time_point elapsed, clock::time_point paused, TimerState_ state) : m_id(id), m_date(start), m_title(title), m_comments{ "" }, m_duration{duration, elapsed, paused, state} {
+
+    }
+
+    int Timer::bindToInsert(sqlite3_stmt* stmt) {
+        return 0;
+    }
+    int Timer::bindToUpdate(sqlite3_stmt* stmt) {
+        using std::string;
+        int rc = SQLITE_OK;
+        // Bind ID
+        rc = sqlite3_bind_int(stmt, static_cast<update_val>(UPDATE_BINDING::ID), m_id);
+        if (rc != SQLITE_OK) return rc;
+        // Bind title
+        rc = sqlite3_bind_text(stmt, static_cast<update_val>(UPDATE_BINDING::TITLE), m_title.c_str(), m_title.size() + 1, SQLITE_TRANSIENT);
+        if (rc != SQLITE_OK) return rc;
+
+        // Bind Duration values
+        return m_duration.bindToStmt(stmt);
+    }
+    int Timer::bindToStmt(sqlite3_stmt* stmt, StatementType_ type) {
+        switch (type)
+        {
+        case data::StatementType_::INSERT:
+            return bindToInsert(stmt);
+            break;
+        case data::StatementType_::UPDATE:
+            return bindToUpdate(stmt);
+            break;
+        }
     }
 
     int Timer::getId() const {
@@ -97,5 +166,36 @@ namespace data {
 
     void Timer::stop() {
         m_duration.updateState(TimerState_::STOP);
+    }
+
+    TimerState_ Timer::getState() const {
+        return m_duration.getState();
+    }
+    clock::time_point Timer::getElapsed() {
+        return m_duration.getElapsed();
+    }
+    clock::time_point Timer::getPausedAt() {
+        return m_duration.getPausedAt();
+    }
+
+    Timer Timer::parse(sqlite3_stmt* stmt) {
+        int id = sqlite3_column_int(stmt, 0);
+        std::string title((char*)sqlite3_column_text(stmt, 1));
+        long long start_count = sqlite3_column_int64(stmt, 2);
+        auto start = system_clock::time_point{ system_clock::duration(start_count) };
+
+        // TimerDuration
+        std::string state_v((char*)sqlite3_column_text(stmt, 3));
+        data::TimerState_ state = data::TimerState_::STOP;
+        if (state_v == "PLAY") state = data::TimerState_::PLAY;
+        else if (state_v == "PAUSE") state = data::TimerState_::PAUSE;
+        long long duration_count = sqlite3_column_int64(stmt, 4);
+        auto duration = system_clock::time_point{ system_clock::duration(duration_count) };
+        long long elapsed_count = sqlite3_column_int64(stmt, 5);
+        auto elapsed = system_clock::time_point{ system_clock::duration(elapsed_count) };
+        long long paused_count = sqlite3_column_int64(stmt, 6);
+        auto paused = system_clock::time_point{ system_clock::duration(paused_count) };
+
+        return Timer(id, start, title, duration, elapsed, paused, state);
     }
 }

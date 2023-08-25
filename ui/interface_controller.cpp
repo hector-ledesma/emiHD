@@ -5,14 +5,15 @@
 #include "elements/timer_container.h"
 #include "elements/active_timer.h"
 #include "elements/history_table.h"
+#include "../Application.h"
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
 
 namespace UI {
-    InterfaceController::InterfaceController(data::DataController dataController) :
-        m_dataController(dataController)
+    InterfaceController::InterfaceController(std::shared_ptr<data::DataController> dataController) :
+        m_dataController{dataController}
     {}
     InterfaceController::~InterfaceController() {}
 
@@ -20,7 +21,7 @@ namespace UI {
         // Application layout will be placed within one full screen parent window
         static ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDecoration;
         UI::RootWindow root{ root_flags };
-        static auto& timers = m_dataController.getAllTimers();
+        static auto& timers = m_dataController->getAllTimers(emiHD::AppSettings::_refetchTimers);
         root.render([this] {
             ImGuiWindowFlags none_flags = ImGuiWindowFlags_None;
             UI::RootLPanel lPanel{ none_flags };
@@ -34,14 +35,14 @@ namespace UI {
                 // Logic controller create new timer here
                 std::string title = new_timer_title;
                 if (!title.empty()) {
-                    m_dataController.createTimer(title);
+                    m_dataController->createTimer(title);
                     memset(new_timer_title, 0, 256);
                 }
             }
             
             for (auto& timer : timers) {
                 if (timer->isRunning()) {
-                    UI::Timer active_timer(none_flags, timer);
+                    UI::Timer active_timer(none_flags, timer, m_dataController);
                     active_timer.render();
                 }
             }
