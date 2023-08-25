@@ -1,7 +1,14 @@
 #include "Application.h"
 
 namespace emiHD {
-    Application::Application() : m_imgui(), m_data(), m_interface(m_data) {}
+    bool AppSettings::_refetchTimers = false;
+
+    Application::Application() : 
+        m_imgui(),
+        m_data(std::shared_ptr<data::DataController>(new data::DataController())),
+        m_interface(m_data) {
+    }
+
     Application::~Application() {}
 
     void Application::run() {
@@ -9,6 +16,8 @@ namespace emiHD {
         if (!m_imgui.init()) return;
         // Main loop
         bool done = false;
+        // Fetch from database on first launch 
+        AppSettings::_refetchTimers = true;
         while (!done)
         {
             // Poll and handle messages (inputs, window resize, etc.)
@@ -29,6 +38,8 @@ namespace emiHD {
             // ImGui Rendering
             m_imgui.render();
             
+            // Turn off refetching until application UI requests it
+            AppSettings::_refetchTimers = false;
         }
         // Cleanup UI
         m_imgui.cleanup();
