@@ -35,14 +35,26 @@ namespace data {
         // Of format:
         //    INSERT INTO TIMERS (TITLE, START_DATE, STATE, DURATION, ELAPSED, PAUSED) VALUES (?, ?, ?, ?, ?, ?)
         rc = sqlite3_bind_text(m_timerInsert, 1, title.c_str(), title.size() + 1, SQLITE_TRANSIENT);
-        assert (rc == SQLITE_OK);
+        if (rc != SQLITE_OK) {
+            std::cout << "Failed to bind. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
+            assert(false);
+        }
         rc = sqlite3_bind_int64(m_timerInsert, 2, now.time_since_epoch().count());
-        assert (rc == SQLITE_OK);
+        if (rc != SQLITE_OK) {
+            std::cout << "Failed to bind. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
+            assert(false);
+        }
         std::string state{ "PLAY" };
         rc = sqlite3_bind_text(m_timerInsert, 3, state.c_str(), state.size() + 1, SQLITE_TRANSIENT);
-        assert (rc == SQLITE_OK);
+        if (rc != SQLITE_OK) {
+            std::cout << "Failed to bind. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
+            assert(false);
+        }
         rc = sqlite3_bind_int64(m_timerInsert, 4, now.time_since_epoch().count());
-        assert(rc == SQLITE_OK);
+        if (rc != SQLITE_OK) {
+            std::cout << "Failed to bind. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
+            assert(false);
+        }
         rc = sqlite3_step(m_timerInsert);
         if (rc != SQLITE_DONE && rc != SQLITE_ROW) {
             std::cout << "Failed to insert. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
@@ -66,7 +78,6 @@ namespace data {
             }
         }
         sqlite3_reset(m_timerUpdate);
-
         switch (changeTo)
         {
         case TimerState_::STOP:
@@ -79,8 +90,12 @@ namespace data {
             assert(false); // This should never be called with any other values yet
             break;
         }
-        assert (timer->bindToStmt(m_timerUpdate, StatementType_::UPDATE) == SQLITE_OK);
-        int rc = sqlite3_step(m_timerUpdate);
+        int rc = timer->bindToStmt(m_timerUpdate, StatementType_::UPDATE);
+        if (rc != SQLITE_OK) {
+            std::cout << "Failed to bind. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
+            assert(false);
+        }
+        rc = sqlite3_step(m_timerUpdate);
         if (rc != SQLITE_DONE && rc != SQLITE_ROW) {
             std::cout << "Failed to insert. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
             assert(false);
@@ -90,7 +105,10 @@ namespace data {
     void DataController::fetchTimers() {
         if (m_selectAll == nullptr) {
             int rc = sqlite3_prepare_v2(m_dbHandle, SELECT_QUERY.c_str(), SELECT_QUERY.size() + 1, &m_selectAll, nullptr);
-            assert (rc == SQLITE_OK);
+            if (rc != SQLITE_OK) {
+                std::cout << "Failed to bind. " << "RC: " << rc << " msg: " << sqlite3_errmsg(m_dbHandle) << "\n";
+                assert(false);
+            }
         }
         sqlite3_reset(m_selectAll);
         while (sqlite3_step(m_selectAll) == SQLITE_ROW) {
