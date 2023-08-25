@@ -8,8 +8,18 @@
 
 struct test {
     bool operator() (const std::shared_ptr<data::Timer> a, const std::shared_ptr<data::Timer> b) const {
-
-        return a->getStartTime() == b->getStartTime() ? a->getId() > b->getId() : a->isRunning() && !b->isRunning() || a->getStartTime() > b->getStartTime();
+        bool bothrunning = a->isRunning() && b->isRunning();
+        bool bothstopped = !a->isRunning() && !b->isRunning();
+        bool isearlier = a->getStartTime() > b->getStartTime();
+        if (bothrunning || bothstopped) {
+            if (a->getStartTime() == b->getStartTime()) {
+                return a->getId() > b->getId();
+            }
+            return isearlier;
+        }
+        
+        return a->isRunning();
+        //return a->getStartTime() == b->getStartTime() ? a->getId() > b->getId() : a->isRunning() && !b->isRunning() || a->getStartTime() > b->getStartTime();
     }
 };
 
