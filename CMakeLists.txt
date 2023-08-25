@@ -3,8 +3,8 @@
 #
 cmake_minimum_required (VERSION 3.8)
 project ("emiHD")
-add_executable (emiHD "emiHD.cpp" "emiHD.h" "Application.cpp" "Application.h")
-
+add_executable (emiHD WIN32 "emiHD.cpp" "emiHD.h" "Application.cpp" "Application.h")
+target_link_options(emiHD PRIVATE -mwindows)
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET emiHD PROPERTY CXX_STANDARD 20)
 endif()

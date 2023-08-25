@@ -14,7 +14,7 @@
 #pragma comment(lib, "dxguid.lib")
 #endif
 
-int main()
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
     emiHD::Application app;
     app.run();
